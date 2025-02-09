@@ -1,13 +1,22 @@
 #include <WiFi.h>  // Use WiFiNINA if you installed that library
 
 // Replace with your network credentials
-#ifndef STASSID
-#define STASSID "your-ssid"
-#define STAPSK "your-password"
+#ifndef STA_SSID
+#define STA_SSID "your-ssid"
+#define STA_PSK "your-password"
 #endif
 
-const char *ssid = STASSID;
-const char *password = STAPSK;
+#ifndef AP_SSID
+#define AP_SSID "picocraft"
+#define AP_PSK "picocraft"
+#endif
+
+#define USE_AP_MODE false
+
+const char *ssid = STA_SSID;
+const char *password = STA_PSK;
+const char *ap_ssid = AP_SSID;
+const char *ap_password = AP_PSK;
 
 WiFiServer server(25565); // Using port 25565 for Minecraft server
 #define MAX_CONNECTIONS 4
@@ -632,7 +641,11 @@ void setup() {
   Serial.print("Connecting to WiFi: ");
   Serial.println(ssid);
 
-  WiFi.begin(ssid, password);
+  if (USE_AP_MODE) {
+    WiFi.beginAP(ap_ssid, ap_password);
+  } else {
+    WiFi.begin(ssid, password);
+  }
   
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
